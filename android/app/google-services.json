@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "496756762670",
+    "project_id": "trips-flutter-app-e6ac8",
+    "storage_bucket": "trips-flutter-app-e6ac8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:496756762670:android:e498a09ee1ae61ff2917bf",
+        "android_client_info": {
+          "package_name": "com.sana.trips_flutter_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAik3UKpsoVbkWFef1ZVa3_wpfBR_4cwNs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
