@@ -1,37 +1,43 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:trips_flutter_app/models/trips.dart';
 import 'package:trips_flutter_app/screens/details/details.dart';
 
-class TripList extends StatefulWidget {
+class TripList extends StatelessWidget {
   @override
-  _TripListState createState() => _TripListState();
-}
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('trips').snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
 
-class _TripListState extends State<TripList> {
-  List<Widget> _tripTiles = [];
-  final GlobalKey _listKey = GlobalKey();
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
 
-  @override
-  void initState() {
-    super.initState();
-    _addTrips();
+        List<Trip> trips = snapshot.data!.docs.map((doc) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          return Trip(
+            title: data['title'],
+            price: data['price'],
+            nights: data['nights'],
+            img: data['img'],
+          );
+        }).toList();
+
+        return ListView.builder(
+          itemCount: trips.length,
+          itemBuilder: (context, index) {
+            return _buildTile(context, trips[index]);
+          },
+        );
+      },
+    );
   }
 
-  void _addTrips() {
-    // get data from db
-    List<Trip> _trips = [
-      Trip(title: 'Beach Paradise', price: '350', nights: '3', img: 'beach.png'),
-      Trip(title: 'City Break', price: '400', nights: '5', img: 'city.png'),
-      Trip(title: 'Ski Adventure', price: '750', nights: '2', img: 'ski.png'),
-      Trip(title: 'Space Blast', price: '600', nights: '4', img: 'space.png'),
-    ];
-
-    _trips.forEach((Trip trip) {
-      _tripTiles.add(_buildTile(trip));
-    });
-  }
-
-  Widget _buildTile(Trip trip) {
+  Widget _buildTile(BuildContext context, Trip trip) {
     return ListTile(
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) => Details(trip: trip)));
@@ -45,25 +51,14 @@ class _TripListState extends State<TripList> {
           Text(trip.title!, style: TextStyle(fontSize: 20, color: Colors.grey[600])),
         ],
       ),
-      leading: ClipRRect(
+      leading: trip.img != null ? ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
         child: Image.asset(
           'images/${trip.img}',
           height: 50.0,
         ),
-      ),
+      ): const SizedBox(),
       trailing: Text('\$${trip.price}'),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-        key: _listKey,
-        itemCount: _tripTiles.length,
-        itemBuilder: (context, index) {
-          return _tripTiles[index];
-        }
     );
   }
 }
